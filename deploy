@@ -1,0 +1,16 @@
+pipeline {
+    agent any
+    parameters{string(description: 'please enter tag number:', name: 'tag_number')}
+
+    stages {
+        stage('deployment on another server') {
+            steps {
+                echo "$tag_number"
+                sshagent(['ssh-deploy']) {
+                sh 'scp -o StrictHostKeyChecking=no  /opt/backup/java-jar.$tag_number.jar root@13.208.45.149:~'
+                sh 'ssh -o StrictHostKeyChecking=no  root@13.208.45.149 nohup java -jar /root/java-jar.$tag_number.jar &'
+                }
+            }
+        }
+    }
+}
